@@ -1,6 +1,6 @@
 import pygame
 import sys
-from src.settings import SCREEN_WIDTH, SCREEN_HEIGHT, FPS, BLACK
+from src.settings import SCREEN_WIDTH, SCREEN_HEIGHT, FPS, BLACK, MOVE_DELAY
 from src.entities import Player
 
 class Game:
@@ -18,7 +18,7 @@ class Game:
         self.all_sprites.add(self.player) # プレイヤーをスプライトグループに追加
         
         # 移動制御用
-        self.move_delay = 100  # 連続移動の間隔(ms)
+        self.move_delay = MOVE_DELAY  # 連続移動の間隔(ms)
         self.last_move_time = 0 # 最後に移動した時間
 
     def run(self): # メインループ
