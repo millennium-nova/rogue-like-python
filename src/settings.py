@@ -1,0 +1,12 @@
+# src/settings.py
+TILE_SIZE = 32
+ROWS = 20
+COLS = 30
+SCREEN_WIDTH = TILE_SIZE * COLS
+SCREEN_HEIGHT = TILE_SIZE * ROWS
+FPS = 60
+
+# Colors (R, G, B)
+BLACK = (0, 0, 0)
+WHITE = (255, 255, 255)
+RED = (255, 0, 0)

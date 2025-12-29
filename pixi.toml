@@ -1,0 +1,11 @@
+[workspace]
+channels = ["conda-forge"]
+name = "rogue-like-python"
+platforms = ["osx-arm64"]
+version = "0.1.0"
+
+[tasks]
+
+[dependencies]
+python = "3.12.*"
+pygame = ">=2.6.1,<3"
