@@ -1,7 +1,9 @@
 import pygame
 import sys
-from src.settings import SCREEN_WIDTH, SCREEN_HEIGHT, FPS, BLACK, MOVE_DELAY
+import random
+from src.settings import SCREEN_WIDTH, SCREEN_HEIGHT, FPS, BLACK, WHITE, MOVE_DELAY, COLS, ROWS, TILE_SIZE
 from src.entities import Player
+from src.dungeon import DungeonGenerator, TILE_FLOOR, TILE_WALL
 
 class Game:
     def __init__(self):
@@ -11,10 +13,27 @@ class Game:
         self.clock = pygame.time.Clock() # フレームレートを保つための時計
         self.running = True # 動作中かどうかを示すフラグ
 
+        # ダンジョン生成
+        self.dungeon_generator = DungeonGenerator()
+        self.map_data = self.dungeon_generator.generate_map(COLS, ROWS)
+
         # Sprite: ゲーム内に登場するオブジェクトのベースになるクラス
         # Group: スプライトをまとめて管理するコンテナ
         self.all_sprites = pygame.sprite.Group()    
-        self.player = Player(1, 1) # プレイヤーを初期位置に作成
+        
+        # プレイヤーの初期位置をランダムな床の上に設定
+        valid_positions = []
+        for y, row in enumerate(self.map_data):
+            for x, tile in enumerate(row):
+                if tile == TILE_FLOOR:
+                    valid_positions.append((x, y))
+        
+        if valid_positions:
+            start_pos = random.choice(valid_positions)
+            self.player = Player(start_pos[0], start_pos[1])
+        else:
+            self.player = Player(1, 1) # フォールバック
+
         self.all_sprites.add(self.player) # プレイヤーをスプライトグループに追加
         
         # 移動制御用
@@ -61,5 +80,15 @@ class Game:
 
     def draw(self):
         self.screen.fill(BLACK) # 画面を黒でクリア (これがないと前のフレームの残像が出る)
+
+        # マップ描画
+        for y, row in enumerate(self.map_data):
+            for x, tile in enumerate(row):
+                rect = (x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE)
+                if tile == TILE_FLOOR:
+                    pygame.draw.rect(self.screen, WHITE, rect)
+                elif tile == TILE_WALL:
+                    pygame.draw.rect(self.screen, BLACK, rect)
+
         self.all_sprites.draw(self.screen) # すべてのスプライトを描画
         pygame.display.flip() # 画面更新
