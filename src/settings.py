@@ -7,6 +7,10 @@ SCREEN_HEIGHT = TILE_SIZE * ROWS
 FPS = 60
 MOVE_DELAY = 200
 
+# tile values
+TILE_FLOOR = 0
+TILE_WALL = 1
+
 # Colors (R, G, B)
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)

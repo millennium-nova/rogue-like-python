@@ -1,8 +1,5 @@
 import random
-
-# タイルID
-TILE_FLOOR = 0
-TILE_WALL = 1
+from src.settings import TILE_FLOOR, TILE_WALL
 
 class Node:
     """BSP木のノード。ダンジョンの区画を表す。"""
