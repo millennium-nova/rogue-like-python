@@ -31,6 +31,7 @@ class Enemy(pygame.sprite.Sprite):
         self.rect.y = y * TILE_SIZE
     
     def update(self, map_data):
+        # 上下左右のいずれかにランダムに移動
         directions = [(0, 1), (0, -1), (1, 0), (-1, 0)]
         random.shuffle(directions)
         for dx, dy in directions:
