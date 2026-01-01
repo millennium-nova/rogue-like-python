@@ -47,7 +47,7 @@ class Game:
         """各部屋に敵を配置する（プレイヤーのいる部屋を除く）"""
         player_room_index = -1
         
-        # プレイヤーがどの部屋にいるか特定（簡易判定）
+        # プレイヤーがどの部屋にいるか特定
         px, py = self.player.rect.x // TILE_SIZE, self.player.rect.y // TILE_SIZE
         for i, room in enumerate(self.dungeon_generator.rooms):
             rx, ry, rw, rh = room
@@ -129,8 +129,8 @@ class Game:
                             self.enemy_turn_pending = True
 
     def update(self):
-        # NOTE: Enemy.update(map_data) は引数が必要なので、all_sprites.update() は呼ばない。
-        # 「キー入力があったときだけ敵も動く」ターン制にしたいので、フラグを使って制御する。
+        # NOTE: Enemy.update(map_data) は引数が必要なので、all_sprites.update() は呼ばない
+        # 「キー入力があったときだけ敵も動く」ターン制にしたいので、フラグを使って制御する
         if self.enemy_turn_pending:
             self.enemies.update(self.map_data)
             self.enemy_turn_pending = False

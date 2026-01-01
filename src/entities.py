@@ -14,7 +14,6 @@ class Player(pygame.sprite.Sprite):
         self.hp = self.max_hp
         self.attack_power = PLAYER_ATTACK_POWER
         self.is_alive = True
-        
 
     def move(self, dx, dy, map_data):
         """プレイヤーを移動させる。移動先が床であれば移動可能。"""
@@ -25,6 +24,7 @@ class Player(pygame.sprite.Sprite):
         if 0 <= tile_y < len(map_data) and 0 <= tile_x < len(map_data[0]) and map_data[tile_y][tile_x] == TILE_FLOOR: # タイルがマップ内かつ床であるか確認
             self.rect.x = new_x
             self.rect.y = new_y
+
 
 class Enemy(pygame.sprite.Sprite):
     def __init__(self, x, y):
