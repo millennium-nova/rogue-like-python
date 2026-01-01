@@ -27,3 +27,11 @@ TILE_WALL = 1
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
 RED = (255, 0, 0)
+
+# Player stats
+PLAYER_HP = 30
+PLAYER_ATTACK_POWER = 5
+
+# Enemy stats
+ENEMY_HP = 10
+ENEMY_ATTACK_POWER = 2
