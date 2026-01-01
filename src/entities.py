@@ -1,4 +1,5 @@
 import pygame
+import random
 from src.settings import TILE_SIZE, RED, TILE_FLOOR, TILE_WALL
 
 class Player(pygame.sprite.Sprite):

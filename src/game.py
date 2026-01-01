@@ -2,7 +2,7 @@ import pygame
 import sys
 import random
 from src.settings import SCREEN_WIDTH, SCREEN_HEIGHT, FPS, BLACK, WHITE, MOVE_DELAY, COLS, ROWS, TILE_SIZE, TILE_FLOOR, TILE_WALL
-from src.entities import Player
+from src.entities import Player, Enemy
 from src.dungeon import DungeonGenerator
 
 class Game:
@@ -37,6 +37,40 @@ class Game:
 
         self.all_sprites.add(self.player) # プレイヤーをスプライトグループに追加
         
+        # 敵の生成
+        self._spawn_enemies()
+
+        # 「プレイヤーが動いたら敵も動く」ためのフラグ
+        self.enemy_turn_pending = False
+
+    def _spawn_enemies(self):
+        """各部屋に敵を配置する（プレイヤーのいる部屋を除く）"""
+        player_room_index = -1
+        
+        # プレイヤーがどの部屋にいるか特定（簡易判定）
+        px, py = self.player.rect.x // TILE_SIZE, self.player.rect.y // TILE_SIZE
+        for i, room in enumerate(self.dungeon_generator.rooms):
+            rx, ry, rw, rh = room
+            if rx <= px < rx + rw and ry <= py < ry + rh:
+                player_room_index = i
+                break
+        
+        # 部屋ごとに敵を配置
+        for i, room in enumerate(self.dungeon_generator.rooms):
+            if i == player_room_index:
+                continue # プレイヤーのいる部屋には敵を置かない
+            
+            # 一定の確率で敵を配置
+            if random.random() < 0.8:
+                rx, ry, rw, rh = room
+                # 部屋の中のランダムな位置
+                ex = rx + random.randint(0, rw - 1)
+                ey = ry + random.randint(0, rh - 1)
+                
+                enemy = Enemy(ex, ey)
+                self.all_sprites.add(enemy)
+                self.enemies.add(enemy)
+
     def run(self): # メインループ
         while self.running:
             self.handle_events() # イベント処理
@@ -64,10 +98,14 @@ class Game:
                 
                 if dx != 0 or dy != 0:
                     self.player.move(dx, dy, self.map_data)
-                    self.enemies.update(self.map_data)
+                    self.enemy_turn_pending = True
 
     def update(self):
-        self.all_sprites.update()
+        # NOTE: Enemy.update(map_data) は引数が必要なので、all_sprites.update() は呼ばない。
+        # 「キー入力があったときだけ敵も動く」ターン制にしたいので、フラグを使って制御する。
+        if self.enemy_turn_pending:
+            self.enemies.update(self.map_data)
+            self.enemy_turn_pending = False
 
     def draw(self):
         self.screen.fill(BLACK) # 画面を黒でクリア (これがないと前のフレームの残像が出る)
@@ -83,3 +121,5 @@ class Game:
 
         self.all_sprites.draw(self.screen) # すべてのスプライトを描画
         pygame.display.flip() # 画面更新
+        
+       

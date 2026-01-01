@@ -25,6 +25,7 @@ class DungeonGenerator:
     """
     def __init__(self):
         self.map_data = []
+        self.rooms = [] # 生成された部屋のリスト (x, y, w, h)
         self.min_size = 8  # 区画の最小サイズ
         self.min_room_size = 5 # 部屋の最小サイズ
 
@@ -42,6 +43,7 @@ class DungeonGenerator:
         # すべてのタイルを壁に設定
         # width 個の TILE_WALL を要素に持つ配列を height 個作成
         self.map_data = [[TILE_WALL for _ in range(width)] for _ in range(height)]
+        self.rooms = [] # 部屋リストを初期化
         
         root = Node(0, 0, width, height)
         
@@ -111,6 +113,7 @@ class DungeonGenerator:
         y = node.y + random.randint(1, max(1, node.height - h - 1))
         
         node.room = (x, y, w, h)
+        self.rooms.append(node.room) # 部屋リストに追加
         
         # マップデータに書き込み
         for i in range(y, y + h):
