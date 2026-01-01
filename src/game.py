@@ -97,8 +97,36 @@ class Game:
                     dy = 1
                 
                 if dx != 0 or dy != 0:
-                    self.player.move(dx, dy, self.map_data)
-                    self.enemy_turn_pending = True
+                    # まず「移動予定の座標（タイル座標）」を計算
+                    player_tile_x = self.player.rect.x // TILE_SIZE
+                    player_tile_y = self.player.rect.y // TILE_SIZE
+                    target_x = player_tile_x + dx
+                    target_y = player_tile_y + dy
+
+                    # 移動先に敵がいるか確認
+                    target_enemy = None
+                    for enemy in self.enemies:
+                        enemy_tile_x = enemy.rect.x // TILE_SIZE
+                        enemy_tile_y = enemy.rect.y // TILE_SIZE
+                        if enemy_tile_x == target_x and enemy_tile_y == target_y:
+                            target_enemy = enemy
+                            break
+
+                    # 敵がいる場合: 攻撃 / いない場合: 移動
+                    if target_enemy is not None:
+                        print("Player attacks Enemy!")
+                        target_enemy.hp -= self.player.attack_power
+                        if target_enemy.hp <= 0:
+                            # kill() で所属している全てのGroupから削除される
+                            target_enemy.kill()
+                        self.enemy_turn_pending = True
+                    else:
+                        # 通常移動（移動できたかどうかでターン消費を決める）
+                        before_x, before_y = self.player.rect.x, self.player.rect.y
+                        self.player.move(dx, dy, self.map_data)
+                        moved = (self.player.rect.x != before_x) or (self.player.rect.y != before_y)
+                        if moved:
+                            self.enemy_turn_pending = True
 
     def update(self):
         # NOTE: Enemy.update(map_data) は引数が必要なので、all_sprites.update() は呼ばない。
