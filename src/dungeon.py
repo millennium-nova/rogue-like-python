@@ -1,5 +1,13 @@
 import random
-from src.settings import TILE_FLOOR, TILE_WALL
+from src.settings import (
+    TILE_FLOOR,
+    TILE_WALL,
+    BSP_ASPECT_RATIO_THRESHOLD,
+    BSP_MAX_DEPTH,
+    BSP_MIN_LEAF_SIZE,
+    BSP_MIN_ROOM_SIZE,
+    BSP_ROOM_MARGIN,
+)
 
 class Node:
     """BSP木のノード。ダンジョンの区画を表す。"""
@@ -26,8 +34,11 @@ class DungeonGenerator:
     def __init__(self):
         self.map_data = []
         self.rooms = [] # 生成された部屋のリスト (x, y, w, h)
-        self.min_size = 8  # 区画の最小サイズ
-        self.min_room_size = 5 # 部屋の最小サイズ
+        self.max_depth = BSP_MAX_DEPTH
+        self.min_size = BSP_MIN_LEAF_SIZE  # 区画の最小サイズ
+        self.min_room_size = BSP_MIN_ROOM_SIZE # 部屋の最小サイズ
+        self.room_margin = BSP_ROOM_MARGIN
+        self.aspect_ratio_threshold = BSP_ASPECT_RATIO_THRESHOLD
 
     def generate_map(self, width, height):
         """
@@ -47,8 +58,8 @@ class DungeonGenerator:
         
         root = Node(0, 0, width, height)
         
-        # 再帰的に分割 (4回程度分割)
-        self._split_node(root, 4)
+        # 再帰的に分割
+        self._split_node(root, self.max_depth)
         
         # 部屋と通路の生成
         self._create_rooms_and_corridors(root)
@@ -62,9 +73,9 @@ class DungeonGenerator:
 
         # 分割方向を決定 (縦長なら水平分割、横長なら垂直分割しやすくする)
         split_vertically = random.choice([True, False])
-        if node.width > node.height * 1.5:
+        if node.width > node.height * self.aspect_ratio_threshold:
             split_vertically = True
-        elif node.height > node.width * 1.5:
+        elif node.height > node.width * self.aspect_ratio_threshold:
             split_vertically = False
 
         if split_vertically:
@@ -107,10 +118,21 @@ class DungeonGenerator:
         """区画内にランダムな部屋を作成"""
         # 区画のサイズ内でランダムな部屋のサイズと位置を決定
         # マージンを持たせて壁と隣接しすぎないようにする
-        w = random.randint(self.min_room_size, max(self.min_room_size, node.width - 2))
-        h = random.randint(self.min_room_size, max(self.min_room_size, node.height - 2))
-        x = node.x + random.randint(1, max(1, node.width - w - 1))
-        y = node.y + random.randint(1, max(1, node.height - h - 1))
+        margin = max(0, int(self.room_margin))
+        max_room_w = max(self.min_room_size, node.width - margin * 2)
+        max_room_h = max(self.min_room_size, node.height - margin * 2)
+
+        w = random.randint(self.min_room_size, max_room_w)
+        h = random.randint(self.min_room_size, max_room_h)
+
+        # 部屋の左上が区画からはみ出さないように範囲を計算
+        x_min = node.x + margin
+        y_min = node.y + margin
+        x_max = node.x + node.width - w - margin
+        y_max = node.y + node.height - h - margin
+
+        x = random.randint(x_min, x_max) if x_min <= x_max else x_min
+        y = random.randint(y_min, y_max) if y_min <= y_max else y_min
         
         node.room = (x, y, w, h)
         self.rooms.append(node.room) # 部屋リストに追加
