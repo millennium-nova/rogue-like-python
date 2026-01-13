@@ -4,10 +4,9 @@ from src.settings import TILE_SIZE, RED, TILE_FLOOR, TILE_WALL, TILE_STAIRS, PLA
 from src.pathfinding import get_next_step
 
 class Player(pygame.sprite.Sprite):
-    def __init__(self, x, y):
+    def __init__(self, x, y, image):
         super().__init__()
-        self.image = pygame.Surface((TILE_SIZE, TILE_SIZE)) # プレイヤーの見た目を定義
-        self.image.fill(RED) # 赤色で塗りつぶし
+        self.image = image # プレイヤーの画像
         self.rect = self.image.get_rect() # プレイヤーの位置とサイズを管理する矩形
         self.rect.x = x * TILE_SIZE # 初期位置をタイルサイズに基づいて設定
         self.rect.y = y * TILE_SIZE 
@@ -28,10 +27,9 @@ class Player(pygame.sprite.Sprite):
 
 
 class Enemy(pygame.sprite.Sprite):
-    def __init__(self, x, y):
+    def __init__(self, x, y, image):
         super().__init__()
-        self.image = pygame.Surface((TILE_SIZE, TILE_SIZE)) # 敵の見た目を定義
-        self.image.fill((0, 255, 0)) # 緑色で塗りつぶし
+        self.image = image # 敵の画像
         self.rect = self.image.get_rect() # 敵の位置とサイズを管理する矩形
         self.rect.x = x * TILE_SIZE # 初期位置をタイルサイズに基づいて設定
         self.rect.y = y * TILE_SIZE

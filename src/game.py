@@ -1,6 +1,7 @@
 import pygame
 import sys
 import random
+import os
 from src.settings import SCREEN_WIDTH, SCREEN_HEIGHT, FPS, BLACK, WHITE, YELLOW, MOVE_DELAY, COLS, ROWS, TILE_SIZE, TILE_FLOOR, TILE_WALL, TILE_STAIRS, UI_HEIGHT
 from src.entities import Player, Enemy
 from src.dungeon import DungeonGenerator
@@ -13,6 +14,20 @@ class Game:
         self.clock = pygame.time.Clock() # フレームレートを保つための時計
         self.running = True # 動作フラグ
         self.floor = 1 # 現在の階層
+
+        # 画像の読み込みとリサイズ
+        self.images = {}
+        asset_path = os.path.join(os.path.dirname(__file__), "..", "assets")
+        image_files = {
+            "floor": "floor.png",
+            "wall": "wall.png",
+            "downstairs": "downstairs.png",
+            "player": "player.png",
+            "enemy": "enemy.png"
+        }
+        for key, filename in image_files.items():
+            img = pygame.image.load(os.path.join(asset_path, filename))
+            self.images[key] = pygame.transform.scale(img, (TILE_SIZE, TILE_SIZE))
 
         # ダンジョン生成
         self.dungeon_generator = DungeonGenerator()
@@ -32,9 +47,9 @@ class Game:
         
         if valid_positions:
             start_pos = random.choice(valid_positions)
-            self.player = Player(start_pos[0], start_pos[1])
+            self.player = Player(start_pos[0], start_pos[1], self.images["player"])
         else:
-            self.player = Player(1, 1) # フォールバック
+            self.player = Player(1, 1, self.images["player"]) # フォールバック
 
         self.all_sprites.add(self.player) # プレイヤーをスプライトグループに追加
         
@@ -72,7 +87,7 @@ class Game:
                 ex = rx + random.randint(0, rw - 1)
                 ey = ry + random.randint(0, rh - 1)
                 
-                enemy = Enemy(ex, ey)
+                enemy = Enemy(ex, ey, self.images["enemy"])
                 self.all_sprites.add(enemy)
                 self.enemies.add(enemy)
 
@@ -188,13 +203,13 @@ class Game:
         # マップ描画 (UI領域の下にオフセット)
         for y, row in enumerate(self.map_data):
             for x, tile in enumerate(row):
-                rect = (x * TILE_SIZE, y * TILE_SIZE + UI_HEIGHT, TILE_SIZE, TILE_SIZE)
+                pos = (x * TILE_SIZE, y * TILE_SIZE + UI_HEIGHT)
                 if tile == TILE_FLOOR:
-                    pygame.draw.rect(self.screen, WHITE, rect)
+                    self.screen.blit(self.images["floor"], pos)
                 elif tile == TILE_WALL:
-                    pygame.draw.rect(self.screen, BLACK, rect)
+                    self.screen.blit(self.images["wall"], pos)
                 elif tile == TILE_STAIRS:
-                    pygame.draw.rect(self.screen, YELLOW, rect)
+                    self.screen.blit(self.images["downstairs"], pos)
 
         # スプライト描画 (オフセット適用)
         for sprite in self.all_sprites:
