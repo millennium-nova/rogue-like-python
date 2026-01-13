@@ -1,6 +1,7 @@
 import pygame
 import random
 from src.settings import TILE_SIZE, RED, TILE_FLOOR, TILE_WALL, TILE_STAIRS, PLAYER_HP, ENEMY_HP, PLAYER_ATTACK_POWER, ENEMY_ATTACK_POWER
+from src.pathfinding import get_next_step
 
 class Player(pygame.sprite.Sprite):
     def __init__(self, x, y):
@@ -40,31 +41,22 @@ class Enemy(pygame.sprite.Sprite):
         self.is_alive = True
     
     def update(self, map_data, player_x, player_y):
-        """プレイヤーに1マス近づく単純な追跡AI。壁なら動かない。"""
+        """A*パスファインディングを使用してプレイヤーに向かって移動する。"""
         current_x = self.rect.x // TILE_SIZE
         current_y = self.rect.y // TILE_SIZE
 
-        dx = player_x - current_x
-        dy = player_y - current_y
-
-        # 距離が大きい軸を優先
-        if abs(dx) >= abs(dy):
-            step_x = 1 if dx > 0 else -1 if dx < 0 else 0
-            step_y = 0
-        else:
-            step_x = 0
-            step_y = 1 if dy > 0 else -1 if dy < 0 else 0
-
-        if step_x == 0 and step_y == 0:
-            return  # すでに同じタイル
-
-        new_x = current_x + step_x
-        new_y = current_y + step_y
-
+        # プレイヤーまでの経路を取得し、次の1歩目を取得
+        next_pos = get_next_step((current_x, current_y), (player_x, player_y), map_data)
+        
+        if next_pos is None:
+            return  # 経路が見つからない場合は動かない
+        
+        new_x, new_y = next_pos
+        
         # 移動先にプレイヤーがいる場合は移動しない（重ならないようにする）
         if new_x == player_x and new_y == player_y:
             return
-
-        if 0 <= new_y < len(map_data) and 0 <= new_x < len(map_data[0]) and map_data[new_y][new_x] == TILE_FLOOR:
-            self.rect.x = new_x * TILE_SIZE
-            self.rect.y = new_y * TILE_SIZE
+        
+        # 移動
+        self.rect.x = new_x * TILE_SIZE
+        self.rect.y = new_y * TILE_SIZE
