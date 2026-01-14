@@ -1,7 +1,7 @@
 # Rogue-like Python
 
 PythonとPygameを使用し、GitHub CopilotおよびGeminiを活用して制作したゲームです。
-年末年始休暇の空き時間を利用して、「LLMを活用した短期間でのプロトタイピング」をテーマに制作しました。
+年末年始にまとまった時間が確保できたため、「LLMを活用した短期間でのプロトタイピング」をテーマに制作しました。
 
 ![Demo](./readme-image/screenshot.png)
 
