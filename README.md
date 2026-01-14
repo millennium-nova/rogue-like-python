@@ -3,7 +3,7 @@
 PythonとPygameを使用し、GitHub CopilotおよびGeminiを活用して制作したゲームです。
 年末年始休暇の空き時間を利用して、「LLMを活用した短期間でのプロトタイピング」をテーマに制作しました。
 
-![Demo](https://via.placeholder.com/800x450?text=Game+Screenshot)
+![Demo](./readme-image/screenshot.png)
 
 ## 開発の目的と背景
 * **目的:** 生成AIを開発プロセスに組み込み、未知のアルゴリズム（BSP、A*）を含むゲームを短期間で形にすること。
@@ -43,8 +43,10 @@ AIが生成しやすいよう、機能ごとにファイルを分割して管理
 
 ## インストールと実行方法
 
+> 以下 Pixi がインストールされている前提
+
 ```bash
 git clone [https://github.com/あなたのID/rogue-like-python.git](https://github.com/あなたのID/rogue-like-python.git)
 cd rogue-like-python
-pip install -r requirements.txt
+pixi install
 python main.py
