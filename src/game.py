@@ -13,8 +13,11 @@ class Game:
         pygame.display.set_caption("Rogue-like Python")
         self.clock = pygame.time.Clock() # フレームレートを保つための時計
         self.running = True # 動作フラグ
-        self.floor = 1 # 現在の階層
-
+        
+        # ゲーム状態管理
+        self.state = "title"  # "title" or "playing"
+        self.game_over = False
+        
         # 画像の読み込みとリサイズ
         self.images = {}
         asset_path = os.path.join(os.path.dirname(__file__), "..", "assets")
@@ -28,7 +31,22 @@ class Game:
         for key, filename in image_files.items():
             img = pygame.image.load(os.path.join(asset_path, filename))
             self.images[key] = pygame.transform.scale(img, (TILE_SIZE, TILE_SIZE))
-
+        
+        # ゲーム変数の初期化（ゲーム開始時に設定）
+        self.floor = None
+        self.dungeon_generator = None
+        self.map_data = None
+        self.all_sprites = None
+        self.enemies = None
+        self.player = None
+        self.enemy_turn_pending = False
+    
+    def start_game(self):
+        """ゲームを開始する（マップ生成とプレイヤー配置）"""
+        self.state = "playing"
+        self.floor = 1
+        self.game_over = False
+        
         # ダンジョン生成
         self.dungeon_generator = DungeonGenerator()
         self.map_data = self.dungeon_generator.generate_map(COLS, ROWS)
@@ -58,10 +76,8 @@ class Game:
         
         # 敵の生成
         self._spawn_enemies()
-
-        # 「プレイヤーが動いたら敵も動く」ためのフラグ
+        
         self.enemy_turn_pending = False
-        self.game_over = False
 
     def _spawn_enemies(self):
         """各部屋に敵を配置する（プレイヤーのいる部屋を除く）"""
@@ -105,23 +121,71 @@ class Game:
 
     def run(self): # メインループ
         while self.running:
-            self.handle_events() # イベント処理
-            self.update() # 状態更新
-            self.draw() # 画面描画
+            if self.state == "title":
+                self.handle_title_events()
+                self.draw_title()
+            else:
+                self.handle_events() # イベント処理
+                self.update() # 状態更新
+                self.draw() # 画面描画
             self.clock.tick(FPS) # フレームレートを維持
         
         pygame.quit()
         sys.exit()
+    
+    def handle_title_events(self):
+        """タイトル画面でのイベント処理"""
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                self.running = False
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_SPACE or event.key == pygame.K_RETURN:
+                    self.start_game()
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                # スタートボタンのクリック判定
+                mouse_pos = pygame.mouse.get_pos()
+                button_rect = pygame.Rect(SCREEN_WIDTH // 2 - 100, SCREEN_HEIGHT // 2 + 50, 200, 50)
+                if button_rect.collidepoint(mouse_pos):
+                    self.start_game()
+    
+    def draw_title(self):
+        """タイトル画面を描画"""
+        self.screen.fill(BLACK)
+        
+        # タイトルテキスト
+        title_font = pygame.font.SysFont(None, 72)
+        title_text = title_font.render("ROGUE-LIKE", True, WHITE)
+        title_rect = title_text.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 3))
+        self.screen.blit(title_text, title_rect)
+        
+        # スタートボタン
+        button_rect = pygame.Rect(SCREEN_WIDTH // 2 - 100, SCREEN_HEIGHT // 2 + 50, 200, 50)
+        mouse_pos = pygame.mouse.get_pos()
+        button_color = YELLOW if button_rect.collidepoint(mouse_pos) else WHITE
+        pygame.draw.rect(self.screen, button_color, button_rect, 3)
+        
+        button_font = pygame.font.SysFont(None, 48)
+        button_text = button_font.render("START", True, button_color)
+        button_text_rect = button_text.get_rect(center=button_rect.center)
+        self.screen.blit(button_text, button_text_rect)
+        
+        # 操作説明
+        instruction_font = pygame.font.SysFont(None, 24)
+        instruction_text = instruction_font.render("Press SPACE or ENTER to start", True, WHITE)
+        instruction_rect = instruction_text.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT - 50))
+        self.screen.blit(instruction_text, instruction_rect)
+        
+        pygame.display.flip()
 
     def handle_events(self):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 self.running = False
             elif event.type == pygame.KEYDOWN:
-                # ゲームオーバー時はRキーでリセットのみ受け付ける
+                # ゲームオーバー時はRキーでタイトルに戻る
                 if self.game_over:
                     if event.key == pygame.K_r:
-                        self.__init__()  # ゲームをリセット
+                        self.state = "title"  # タイトル画面に戻る
                     continue
                 
                 dx, dy = 0, 0
