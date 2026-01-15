@@ -1,14 +1,14 @@
 # Rogue-like Python
 
 PythonとPygameを使用し、GitHub CopilotおよびGeminiを活用して制作したゲームです。
-年末年始にまとまった時間が確保できたため、「LLMを活用した短期間でのプロトタイピング」をテーマに制作しました。
+「LLMを活用した短期間でのプロトタイピング」をテーマに制作しました。
 
 ![Screenshot](./readme-image/screenshot.png)
 
 ## 開発の目的と背景
 * **目的:** 生成AIを開発プロセスに組み込み、未知のアルゴリズム（BSP、A*）を含むゲームを短期間で形にすること。
 * **開発期間:** 1週間
-* **技術スタック:** Python 3.x, Pygame
+* **使用言語等:** Python 3.12.12, Pygame 2.6.1
 * **開発ツール:** GitHub Copilot, Gemini, VS Code
 
 ## LLM の利用
