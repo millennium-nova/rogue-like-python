@@ -1,6 +1,6 @@
 # Rogue-like Python
 
-PythonとPygameを使用し、GitHub CopilotおよびGeminiでバイブコーディングを行いました。
+お正月の暇つぶし (暇ではない) として、PythonとPygameを使用し、GitHub CopilotおよびGeminiでバイブコーディングを行いました。
 現在はとりあえずは動くというレベルです。
 
 また時間に余裕ができたら続きを作ってみる予定
