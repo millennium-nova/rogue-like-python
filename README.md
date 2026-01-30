@@ -1,6 +1,8 @@
 # Rogue-like Python
 
 PythonとPygameを使用し、GitHub CopilotおよびGeminiでバイブコーディングを行いました。
+現在はとりあえずは動くというレベルです。
+
 また時間に余裕ができたら続きを作ってみる予定
 
 ![Screenshot](./readme-image/screenshot.png)
